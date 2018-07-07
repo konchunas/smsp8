@@ -91,8 +91,10 @@ function _draw()
  if gamestate=="menu" then
  	rectfill(2,106,40,126,1)
  	rectfill(2,108+sel_item*6,
- 										40,112+sel_item*6,12)
- 	print("pick",4,108,7)
+											40,112+sel_item*6,12)
+		pick_put_str="pick"
+		if (held_item) pick_put_str="put"
+ 	print(pick_put_str,4,108,7)
  	print("use",4,114,7)
  end
 end
@@ -160,8 +162,19 @@ function distance(from,to)
 	return x,y
 end
 
+function spr_to_coord(spr)
+	local x = spr%16
+	local y = flr(spr/16)
+	return x,y
+end
+
+function coord_to_spr(x,y)
+	return x + y * 16
+end
+
 function pick_obj(x,y)
 	local pick=mget_obj(x,y)
+	if (pick==0) do return end
 	first_spr=seek_first(pick)
 	last_spr=seek_last(pick)
 	held_item=first_spr
@@ -180,6 +193,24 @@ function remove_obj(x,y,w,h)
 			mset(i+16,j,0)
 		end
 	end
+end
+
+function put_item()
+	local draw_x=8
+	if (flipped) draw_x=-8 * held_w
+
+	local ix = flr((x+draw_x)/8)
+	local iy = flr(y/8)
+
+	local sx,sy = spr_to_coord(held_item)
+
+	for i=0,held_w-1 do
+		for j=0,held_h-1 do
+			mset(i+ix+16,j+iy,coord_to_spr(sx+i,sy+j))
+		end
+	end
+
+	held_item=nil
 end
 
 function pick_item()
@@ -204,7 +235,11 @@ end
 
 function select_menu()
 	if sel_item==0 then
-		pick_item()
+		if held_item then 
+			put_item()
+		else
+			pick_item()
+		end
 	end
 	gamestate=""
  sel_item=0
