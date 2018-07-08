@@ -5,7 +5,7 @@ function _init()
  x=64
  y=64
  legs_anim = {
- 	from=17, to=21, curr=17
+ 	from=17, to=20, curr=17
  	}
  player_anim = {
  	from=1, to=4, curr=1
@@ -72,7 +72,7 @@ function advance_anim(anim)
 	if flr(anim.curr)==anim.to then
 		anim.curr=anim.from
 	else
-	 anim.curr+=0.26
+	 anim.curr+=0.25
 	end
 end
 
