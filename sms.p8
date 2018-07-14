@@ -265,10 +265,10 @@ function get_put_pos()
 end
 
 function put_item()
-	-- if not can_put() then
-	-- 	sfx(0)
-	-- 	return
-	--end
+	if not can_put() then
+		sfx(0)
+		return
+	end
 	local ix,iy = get_put_pos()
 	local sx,sy = spr_to_coord(held_item)
 
@@ -331,17 +331,31 @@ function is_floor_or_none(x,y)
 	return sprt==0 or sprt==49
 end
 
-function can_put()	
+function can_put()
+	
 	local ix,iy = get_put_pos()
+	local sx,sy = spr_to_coord(held_item)
+
+	can=true
+
 	for i=0,held_w-1 do
 		for j=0,held_h-1 do
-			if mget_obj(i+ix,j+iy)!=0 or
-			mget(i+ix,j+iy)!=49 then
-					return false
+			sprt=coord_to_spr(sx+i,sy+j)
+			local x=i+ix
+			local y=j+iy
+			if fget(sprt,only_above_flag) then
+				can=can and mget(x+48,y)==0
+				can=can and mget(x+32,y)!=0
+			elseif fget(sprt,above_flag) then
+				can=can and mget(x+48,y)==0
+				can=can and mget(x+32,y)==0
+			else
+				can=can and mget(x+16,y)==0
+				can=can and mget(x,y)==49	
 			end
 		end
 	end
-	return true
+	return can
 end
 
 function advance_menu(dir)
